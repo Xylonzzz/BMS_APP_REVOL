@@ -7,10 +7,10 @@
 - [complete] Phase 1: 协议合同与回放质量基线设计
 - [complete] Phase 2: 扩展 Schema、协议解码和模拟场景
 - [complete] Phase 3: API/浏览器证据链验证与文档更新
-- [pending] Phase 4: Windows MVP 设计与实现计划
+- [in_progress] Phase 4: Windows MVP 设计与实现计划
 
 ## Next Step
-Phase 2 和 Phase 3 已完成；下一步是设计 Windows MVP。
+Phase 2 和 Phase 3 已完成；Phase 4 已先完成 Web 工作台视觉重塑，下一步是 Windows MVP 壳与 Edge Agent 适配设计。
 
 ## Errors Encountered
 | Error | Attempt | Resolution |
