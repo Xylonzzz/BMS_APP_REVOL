@@ -1,0 +1,8 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bms-app-revol.local/schemas/ai-analysis.json",
+  "title": "BMS AI Analysis",
+  "type": "object",
+  "required": ["provider", "model", "summary", "severity", "evidence", "nextChecks"],
+  "properties": {"provider": {"type": "string"}, "model": {"type": "string"}, "summary": {"type": "string"}, "severity": {"enum": ["info", "warning", "error"]}, "evidence": {"type": "array", "items": {"type": "string"}}, "suggestedChain": {"type": ["string", "null"]}, "nextChecks": {"type": "array", "items": {"type": "string"}}}
+}

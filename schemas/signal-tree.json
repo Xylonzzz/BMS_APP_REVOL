@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bms-app-revol.local/schemas/signal-tree.json",
+  "title": "BMS Signal Tree",
+  "type": "object",
+  "required": ["id", "timestamp", "firmwareVersion", "totalVoltage", "current", "cells", "frames"],
+  "properties": {
+    "id": {"type": "string"},
+    "timestamp": {"type": "number"},
+    "firmwareVersion": {"type": "string"},
+    "totalVoltage": {"$ref": "#/$defs/bmsValue"},
+    "current": {"$ref": "#/$defs/bmsValue"},
+    "cells": {"type": "array", "items": {"$ref": "#/$defs/cellVoltage"}},
+    "frames": {"type": "array", "items": {"$ref": "#/$defs/canFrame"}},
+    "diagnostics": {"type": "array", "items": {"$ref": "#/$defs/diagnosticEvent"}},
+    "modelDetection": {"$ref": "#/$defs/modelDetection"},
+    "replayScenario": {"type": "string"}
+  },
+  "$defs": {
+    "quality": {"type": "string", "enum": ["valid", "pec_error", "timeout", "partial", "stale", "range_error", "disconnected", "unknown"]},
+    "bmsValue": {"type": "object", "required": ["value", "timestamp", "source", "valid", "quality"], "properties": {"value": {}, "timestamp": {"type": "number"}, "source": {"type": "string"}, "sequence": {"type": "integer"}, "valid": {"type": "boolean"}, "quality": {"$ref": "#/$defs/quality"}, "rawFrameIds": {"type": "array", "items": {"type": "integer"}}}},
+    "cellVoltage": {"allOf": [{"$ref": "#/$defs/bmsValue"}, {"type": "object", "required": ["cellIndex", "unit"], "properties": {"cellIndex": {"type": "integer", "minimum": 0}, "unit": {"const": "mV"}, "physicalValid": {"type": "boolean"}}}]},
+    "canFrame": {"type": "object", "required": ["id", "bus", "data", "dlc", "timestamp", "direction", "sequence"], "properties": {"id": {"type": "integer"}, "bus": {"enum": ["can1", "can2"]}, "data": {"type": "array", "items": {"type": "integer", "minimum": 0, "maximum": 255}}, "dlc": {"type": "integer", "minimum": 0, "maximum": 64}, "timestamp": {"type": "number"}, "direction": {"enum": ["rx", "tx"]}, "sequence": {"type": "integer"}, "ide": {"enum": ["standard", "extended"]}, "rtr": {"type": "boolean"}, "ruleVersion": {"type": "string"}}},
+    "modelDetection": {"type": "object", "required": ["model", "mode", "confidence", "reason", "observed", "ruleVersion", "timestamp"], "properties": {"model": {"enum": ["af", "ef", "unknown"]}, "mode": {"enum": ["automatic", "manual"]}, "confidence": {"enum": ["high", "medium", "low"]}, "reason": {"type": "string"}, "observed": {"type": "array", "items": {"type": "string"}}, "ruleVersion": {"type": "string"}, "timestamp": {"type": "number"}}},
+    "diagnosticEvent": {"type": "object", "required": ["id", "timestamp", "severity", "chain", "code", "message", "evidence", "ruleVersion"], "properties": {"id": {"type": "string"}, "timestamp": {"type": "number"}, "severity": {"enum": ["info", "warning", "error"]}, "chain": {"type": "string"}, "code": {"type": "string"}, "message": {"type": "string"}, "evidence": {"type": "array", "items": {"type": "string"}}, "ruleVersion": {"type": "string"}}}
+  }
+}

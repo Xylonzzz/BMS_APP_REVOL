@@ -1,0 +1,8 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bms-app-revol.local/schemas/websocket-events.json",
+  "title": "BMS WebSocket Events",
+  "type": "object",
+  "required": ["event", "timestamp", "payload"],
+  "properties": {"event": {"type": "string", "enum": ["bms.snapshot.updated", "bms.cell.invalid", "bms.diagnostic.updated", "bms.connection.changed", "bms.model.detected", "bms.replay.loaded"]}, "timestamp": {"type": "number"}, "payload": {"type": "object"}}
+}

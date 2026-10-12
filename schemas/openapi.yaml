@@ -1,0 +1,82 @@
+openapi: 3.1.0
+info:
+  title: BMS APP REVOL API
+  version: 0.1.0
+  description: 只读 BMS 模拟数据与诊断 API
+servers:
+  - url: http://127.0.0.1:8765
+paths:
+  /api/v1/health:
+    get:
+      responses:
+        '200':
+          description: 服务状态
+  /api/v1/snapshots/latest:
+    get:
+      responses:
+        '200':
+          description: 最新 BMS 快照
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BmsSnapshot'
+  /api/v1/snapshots:
+    get:
+      responses:
+        '200':
+          description: 快照列表
+  /api/v1/diagnostics:
+    get:
+      responses:
+        '200':
+          description: 诊断事件列表
+  /api/v1/schema:
+    get:
+      responses:
+        '200':
+          description: 信号树 JSON Schema
+  /api/v1/replay/scenarios:
+    get:
+      responses:
+        '200':
+          description: 可用回放场景
+  /api/v1/replay/scenarios/{name}:
+    get:
+      parameters:
+        - in: path
+          name: name
+          required: true
+          schema: {type: string}
+      responses:
+        '200':
+          description: 回放场景记录
+        '404':
+          description: 未知回放场景
+components:
+  schemas:
+    QualityStatus:
+      type: string
+      enum: [valid, pec_error, timeout, partial, stale, range_error, disconnected, unknown]
+    ModelDetection:
+      type: object
+      required: [model, mode, confidence, reason, observed, ruleVersion, timestamp]
+      properties:
+        model: {type: string, enum: [af, ef, unknown]}
+        mode: {type: string, enum: [automatic, manual]}
+        confidence: {type: string, enum: [high, medium, low]}
+        reason: {type: string}
+        observed: {type: array, items: {type: string}}
+        ruleVersion: {type: string}
+        timestamp: {type: number}
+    BmsSnapshot:
+      type: object
+      required: [id, timestamp, firmwareVersion, totalVoltage, current, cells, frames, diagnostics]
+      properties:
+        id: {type: string}
+        timestamp: {type: number}
+        firmwareVersion: {type: string}
+        totalVoltage: {type: object}
+        current: {type: object}
+        cells: {type: array, items: {type: object}}
+        frames: {type: array, items: {type: object}}
+        diagnostics: {type: array, items: {type: object}}
