@@ -20,7 +20,8 @@ from services.llm_agent.compatible import load_providers, ProviderError
 
 
 def ensure_demo_data(store: SessionStore) -> None:
-    if store.latest() is None:
+    latest = store.latest()
+    if latest is None or "modelDetection" not in latest:
         simulator = Simulator()
         simulator.inject_pec_error(17)
         store.append(simulator.next_snapshot())

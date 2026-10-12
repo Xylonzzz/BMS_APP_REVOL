@@ -1,30 +1,52 @@
 <!doctype html>
 <html lang="zh-CN">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>BMS APP REVOL</title><link rel="stylesheet" href="theme.css"></head>
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>BMS APP REVOL</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="theme.css">
+</head>
 <body data-theme="operations">
 <div class="app-shell">
-  <aside class="sidebar"><div class="brand"><span class="brand-mark">B</span><div><b>BMS APP</b><small>REVOL / 多端监控</small></div></div>
-    <div class="connection-pill"><i id="connection-dot"></i><span id="connection-side">未连接</span></div>
-    <nav id="nav" aria-label="主导航">
-      <button class="nav-item active" data-page="state">BMS状态 <small>总压 · 电流 · SOC</small></button>
-      <button class="nav-item" data-page="voltage">单体电压 <small>AF / EF · PEC</small></button>
-      <button class="nav-item" data-page="temperature">单体温度 <small>温度 · 断线</small></button>
-      <button class="nav-item" data-page="relay">继电器—充电状态 <small>预充 · DCDC · 充电机</small></button>
-      <button class="nav-item" data-page="threshold">阈值 <small>只读预览</small></button>
-      <button class="nav-item" data-page="can">CAN收发 <small>原始帧 · 解析</small></button>
-      <button class="nav-item" data-page="diagnostics">诊断与Agent <small>链路 · 证据</small></button>
+  <aside class="sidebar rail">
+    <div class="brand"><span class="brand-mark">B</span><div><b>BMS APP</b><small>REVOL / SIGNAL WORKSPACE</small></div></div>
+    <div class="connection-pill connection"><i id="connection-dot" class="dot"></i><span id="connection-side">未连接</span></div>
+    <nav id="nav" class="nav" aria-label="主导航">
+      <button class="nav-item active" data-page="state"><strong>总览</strong><small>BMS_STATE · 本批次可信度</small></button>
+      <button class="nav-item" data-page="voltage"><strong>单体电压</strong><small>Cell_Vol_1/2 · 136 + 8 保留槽</small></button>
+      <button class="nav-item" data-page="temperature"><strong>单体温度</strong><small>Cell_Tem_1/2 · NTC 质量</small></button>
+      <button class="nav-item" data-page="relay"><strong>继电器 / 充电</strong><small>realy_charge · 只读</small></button>
+      <button class="nav-item" data-page="threshold"><strong>阈值</strong><small>Threshold_Value1 · 只读</small></button>
+      <button class="nav-item" data-page="can"><strong>CAN 收发</strong><small>原始帧 · 解析对照</small></button>
+      <button class="nav-item" data-page="diagnostics"><strong>诊断与 Agent</strong><small>链路证据 · 规则版本</small></button>
     </nav>
-    <div class="sidebar-foot"><span>固件</span><strong id="firmware-side">—</strong><span>界面</span><select id="theme"><option value="engineering">Engineering</option><option value="operations" selected>Operations</option><option value="minimal">Minimal</option></select></div>
+    <div class="sidebar-foot rail-foot"><span>固件</span><strong id="firmware-side">—</strong><span>外观</span><select id="theme" class="theme-select"><option value="engineering">Engineering</option><option value="operations" selected>Operations</option><option value="minimal">Minimal</option></select><p>AF / EF 自动识别<br><em>证据齐全后才切换</em></p></div>
   </aside>
-  <main class="main"><header class="topbar"><div><p class="eyebrow">BMS APP REVOL / <span id="page-kicker">BMS_STATE</span></p><h1 id="page-title">BMS状态</h1></div><div class="controls"><input id="api-url" value="http://127.0.0.1:8765" aria-label="API地址"><label>回放<select id="replay-scenario" aria-label="回放场景"><option value="">实时快照</option></select></label><label>型号<select id="model-override" aria-label="AF/EF型号"><option value="">自动</option><option value="af">AF</option><option value="ef">EF</option></select></label><button id="replay-load">加载</button><button id="refresh">刷新数据</button><button id="fullscreen">全屏</button></div></header>
-    <section id="page-state" class="page active"><section class="metrics"><article class="metric"><span>总压</span><strong id="total-voltage">—</strong><small>mV / ADC测点</small></article><article class="metric"><span>电流</span><strong id="current">—</strong><small>放电正 · 充电负</small></article><article class="metric"><span>累压</span><strong id="cal-voltage">—</strong><small>单体电压求和</small></article><article class="metric"><span>SOC</span><strong id="soc">—</strong><small>当前快照未提供</small></article></section><section class="grid-two"><article class="panel"><div class="panel-head"><h2>状态摘要</h2><span id="updated">—</span></div><div class="state-grid"><div><small>固件版本</small><b id="firmware">—</b></div><div><small>数据质量</small><b id="quality-summary">—</b></div><div><small>AF / EF</small><b id="model">自动识别</b></div><div><small>识别依据</small><b id="model-reason">—</b></div><div><small>采集批次</small><b id="sequence">—</b></div></div></article><article class="panel"><div class="panel-head"><h2>告警摘要</h2><span id="diagnostic-count">0</span></div><div id="diagnostic-list"><p class="muted">暂无事件</p></div></article></section></section>
-    <section id="page-voltage" class="page"><article class="panel"><div class="panel-head"><div><h2>单体电压 / 兼容144槽</h2><p class="muted">当前物理配置为8×17=136串；无效槽保留原始值并标记原因。</p></div><span id="cell-summary">—</span></div><div id="cells" class="cells"></div></article></section>
-    <section id="page-temperature" class="page"><article class="panel placeholder"><h2>单体温度</h2><p>沿用原上位机 Cell_Tem_1 / Cell_Tem_2 的 AF / EF 页面语义。真实温度字段接入后，这里显示温度值、NTC 质量、断线位图和原始帧。</p><div class="placeholder-tags"><span>48路当前固件遥测</span><span>AF / EF 显示</span><span>温度断线</span></div></article></section>
-    <section id="page-relay" class="page"><article class="panel"><div class="panel-head"><h2>继电器—充电状态</h2><span class="readonly-badge">只读预览</span></div><div class="relay-grid"><div class="relay-card"><span>主正 AIR+</span><b>—</b></div><div class="relay-card"><span>主负 AIR-</span><b>—</b></div><div class="relay-card"><span>预充 PRE</span><b>—</b></div><div class="relay-card"><span>DCDC</span><b>—</b></div><div class="relay-card"><span>充电电压</span><b>—</b></div><div class="relay-card"><span>充电电流</span><b>—</b></div></div><p class="muted note">控制命令尚未接入；预充状态不能被页面显示直接当作独立实测反馈。</p></article></section>
-    <section id="page-threshold" class="page"><article class="panel placeholder"><h2>阈值</h2><p>参考原 Threshold_Value1 页面保留告警名称、等级阈值、Precharge_Time、Balance 和开路参数的分组结构。</p><div class="threshold-list"><span>Cell_OV / Cell_UV</span><span>Cell_OT / Cell_UT</span><span>Cell_ODV / Cell_ODT</span><span>SOC_High / SOC_Low</span><span>Precharge_Time</span><span>Hall_Openwires</span></div></article></section>
-    <section id="page-can" class="page"><article class="panel"><div class="panel-head"><div><h2>CAN收发</h2><p class="muted">原始帧与解析含义并列显示；方向、DLC、IDE、质量必须保留。</p></div><span class="readonly-badge">只读预览</span></div><div class="frame-table-wrap"><table><thead><tr><th>时间</th><th>总线</th><th>ID</th><th>DLC</th><th>方向</th><th>原始数据</th><th>解析</th></tr></thead><tbody id="frame-table"><tr><td colspan="7" class="muted">等待数据</td></tr></tbody></table></div></article></section>
-    <section id="page-diagnostics" class="page"><article class="panel"><div class="panel-head"><h2>诊断与 Agent</h2><span class="readonly-badge">只读分析</span></div><div class="agent-flow"><span>原始帧</span><b>→</b><span>协议解析</span><b>→</b><span>质量判断</span><b>→</b><span>H/A链路</span><b>→</b><span>证据报告</span></div><div id="diagnostic-detail"><p class="muted">暂无诊断事件。Agent 初期只读，不发送继电器、预充、均衡或充电命令。</p></div></article></section>
-  <article class="panel ai-panel"><div class="panel-head"><h2>辅助分析</h2><span class="readonly-badge">只读</span></div><div class="controls"><label for="ai-provider">模型服务</label><select id="ai-provider"><option>正在读取提供商…</option></select><button id="ai-analyze" disabled>分析最新快照</button></div><label class="remote-option"><input type="checkbox" id="ai-allow-remote">允许将本次快照的质量摘要发送给已配置的自定义模型服务</label><p class="muted" id="ai-status" role="status" aria-live="polite">准备分析服务…</p><div id="ai-result" aria-live="polite"></div></article></main>
-</div><script src="app.js"></script><script src="ai.js"></script>
-</body></html>
 
+  <main class="main">
+    <header class="topbar top">
+      <div><div class="eyebrow">BMS APP REVOL / <span id="page-kicker">BMS_STATE</span></div><h1 id="page-title">这批数据，值得相信吗？</h1><p class="top-copy">先看质量，再看数字。原始帧、解析值与诊断证据始终在同一条视线里。</p></div>
+      <div class="controls actions"><input id="api-url" value="http://127.0.0.1:8765" aria-label="API地址"><select id="replay-scenario" class="select" aria-label="回放场景"><option value="">实时快照</option></select><select id="model-override" class="select" aria-label="AF/EF型号"><option value="">自动型号</option><option value="af">AF</option><option value="ef">EF</option></select><button id="replay-load" class="chip">加载回放</button><button id="refresh" class="chip">刷新</button><button id="fullscreen" class="chip">全屏</button></div>
+    </header>
+
+    <section id="page-state" class="page active">
+      <section class="hero"><article class="card signal-card"><div class="card-label"><span>Snapshot quality</span><span>SEQ <b id="sequence">—</b></span></div><div class="big-status"><strong id="quality-state">—</strong><span id="quality-detail">等待数据</span></div><p id="quality-copy" class="signal-copy">正在等待 API 快照。数据质量、AF/EF 判断和原始证据会在同一处显示。</p></article><div class="mini-grid"><div class="mini"><small>总压 / ADC</small><b id="total-voltage">—</b></div><div class="mini"><small>电流</small><b id="current">—</b></div><div class="mini"><small>AF / EF</small><b id="model">—</b></div><div class="mini"><small>固件</small><b id="firmware">—</b></div></div></section>
+      <section class="row"><article class="card"><div class="section-head"><h2>单体电压 · 136 / 144 槽</h2><small id="cell-summary">—</small></div><div id="cells" class="cells"></div><div class="legend"><span>绿色 · 当前有效</span><span class="legend-warn">琥珀 · 待确认</span><span class="legend-bad">珊瑚 · 无效但保留原值</span></div></article><article class="card trend-card"><div class="section-head"><h2>采集批次</h2><small id="updated">—</small></div><div class="spark"><i class="bar" style="height:47%"></i><i class="bar" style="height:54%"></i><i class="bar" style="height:52%"></i><i class="bar" style="height:61%"></i><i class="bar" style="height:57%"></i><i class="bar warn" style="height:70%"></i><i class="bar" style="height:79%"></i></div><div class="legend"><span>当前快照</span><span id="quality-summary">—</span></div></article></section>
+      <section class="card customization"><div class="section-head"><h2>回放与自定义</h2><small>参考时序的外观工作台</small></div><div class="actions customization-actions"><button class="chip" data-theme="engineering">深石墨</button><button class="chip" data-theme="operations">苔绿</button><button class="chip" data-theme="minimal">纸张</button><button class="chip" data-density="compact">紧凑密度</button><button class="chip" data-density="cozy">舒适密度</button><button class="chip" data-motion="off">关闭动效</button></div><div class="model-reason"><span>型号判断依据</span><b id="model-reason">—</b></div></section>
+    </section>
+
+    <section id="page-voltage" class="page"><article class="card"><div class="section-head"><h2>单体电压 / 兼容 144 槽</h2><small>原始值保留 · 质量状态优先</small></div><div id="cells-page" class="cells"></div></article></section>
+    <section id="page-temperature" class="page"><article class="card placeholder"><h2>单体温度 / Cell_Tem_1 · Cell_Tem_2</h2><p>保留 AF / EF 温度页语义。当前阶段通过回放快照展示温度质量、断线和证据来源。</p><div class="placeholder-tags"><span>48 路当前遥测</span><span>AF / EF 显示</span><span>温度断线</span></div></article></section>
+    <section id="page-relay" class="page"><article class="card placeholder"><div class="section-head"><h2>继电器 / 充电</h2><span class="readonly-badge">只读预览</span></div><p>参考旧上位机 realy_charge 页面保留主正、主负、预充、DCDC 和充电机状态分区。控制命令尚未接入。</p></article></section>
+    <section id="page-threshold" class="page"><article class="card placeholder"><h2>阈值 / Threshold_Value1</h2><p>保留告警名称、等级阈值、Precharge_Time、Balance 和开路参数分组。当前为只读预览。</p></article></section>
+    <section id="page-can" class="page"><article class="card"><div class="section-head"><h2>CAN 收发 / 原始帧与解析</h2><span class="readonly-badge">只读预览</span></div><div class="frame-table-wrap"><table><thead><tr><th>时间</th><th>总线</th><th>ID</th><th>DLC</th><th>方向</th><th>原始数据</th><th>解析</th></tr></thead><tbody id="frame-table"><tr><td colspan="7" class="muted">等待数据</td></tr></tbody></table></div></article></section>
+    <section id="page-diagnostics" class="page"><article class="card"><div class="section-head"><h2>诊断与 Agent</h2><span class="readonly-badge">只读分析</span></div><div class="agent-flow"><span>原始帧</span><b>→</b><span>协议解析</span><b>→</b><span>质量判断</span><b>→</b><span>H/A 链路</span><b>→</b><span>证据报告</span></div><div id="diagnostic-detail"><p class="muted">暂无诊断事件。</p></div></article></section>
+    <article class="card ai-panel"><div class="section-head"><h2>辅助分析</h2><span class="readonly-badge">只读</span></div><div class="controls"><label for="ai-provider">模型服务</label><select id="ai-provider" class="select"><option>正在读取提供商…</option></select><button id="ai-analyze" class="chip" disabled>分析最新快照</button></div><label class="remote-option"><input type="checkbox" id="ai-allow-remote">允许将本次快照的质量摘要发送给已配置的自定义模型服务</label><p class="muted" id="ai-status" role="status" aria-live="polite">准备分析服务…</p><div id="ai-result" aria-live="polite"></div></article>
+  </main>
+
+  <aside class="evidence"><div class="eyebrow">EVIDENCE RAIL</div><h2>这次判断凭什么？</h2><p class="evidence-sub">每个数字都能回到帧、规则和时间。</p><div class="rail-line" id="evidence-rail"><div class="ev"><small>01 · RAW FRAME</small><b>等待原始帧</b><p>API 快照加载后，显示总线、ID、DLC、方向和解析规则。</p></div></div><div class="frame"><div class="eyebrow">LAST FRAME</div><code id="last-frame">CAN —\n等待数据</code></div><div class="tune"><div class="tune-title"><b>质量状态</b><small id="model-reason-side">—</small></div><div class="quality-key"><span><i class="key-dot valid"></i>有效</span><span><i class="key-dot warn"></i>待确认</span><span><i class="key-dot bad"></i>无效</span></div></div></aside>
+</div>
+<script src="app.js"></script><script src="ai.js"></script>
+</body>
+</html>
