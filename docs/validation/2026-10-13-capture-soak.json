@@ -1,0 +1,15 @@
+{
+  "hardware": false,
+  "source": "synthetic injected adapter",
+  "requestedSeconds": 60.0,
+  "success": true,
+  "elapsedSeconds": 61.67,
+  "rawFrames": 39520,
+  "snapshots": 117,
+  "httpPolls": 401,
+  "concurrentZipExports": 20,
+  "maxLatestLatencyMs": 87.7,
+  "missingFrames": 0,
+  "portClosed": true,
+  "sourceClosed": true
+}

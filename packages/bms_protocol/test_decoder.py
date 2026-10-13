@@ -4,8 +4,36 @@ from packages.bms_protocol.decoder import decode_can1_frame
 
 
 class ProtocolDecoderTests(unittest.TestCase):
+    def test_real_or_file_frame_cannot_claim_sampling_validity(self):
+        base = {"id": 0x104, "bus": "can1", "direction": "rx", "ide": "standard", "rtr": False,
+                "data": [0x70, 0x0E] * 4, "dlc": 8, "qualityMetadataSource": "simulation",
+                "signalQualities": {"cellVoltage[0]": "valid"}}
+        for source in ("can", "file"):
+            signals = decode_can1_frame(dict(base, acquisitionSource=source))
+            self.assertEqual(signals[0]["value"], 3696)
+            self.assertEqual(signals[0]["quality"], "unknown")
+
+    def test_missing_frame_metadata_is_unknown(self):
+        base = {"id": 0x104, "bus": "can1", "direction": "rx", "ide": "standard", "rtr": False, "data": [0x70, 0x0E] * 4, "dlc": 8}
+        for field in ("bus", "direction", "ide", "rtr", "dlc"):
+            frame = dict(base)
+            frame.pop(field)
+            with self.subTest(field=field):
+                self.assertTrue(all(s["quality"] != "valid" for s in decode_can1_frame(frame)))
+    def test_invalid_frame_boundaries_never_decode_as_valid_signals(self):
+        base = {"id": 0x104, "bus": "can1", "direction": "rx", "ide": "standard", "rtr": False, "data": [0x70, 0x0E] * 4, "dlc": 8}
+        for field, value in (("bus", "can2"), ("direction", "tx"), ("ide", "extended"), ("rtr", True), ("dlc", 9), ("data", [256] * 8)):
+            with self.subTest(field=field):
+                signals = decode_can1_frame(dict(base, **{field: value}))
+                self.assertTrue(all(s["quality"] != "valid" for s in signals))
+
+    def test_dlc_limits_access_to_padded_buffer(self):
+        frame = {"id": 0x104, "bus": "can1", "direction": "rx", "ide": "standard", "rtr": False, "data": [0x70, 0x0E] * 4, "dlc": 2}
+        signals = decode_can1_frame(frame)
+        self.assertEqual(signals[0]["value"], 3696)
+        self.assertTrue(all(s["value"] is None for s in signals[1:]))
     def test_decodes_status_frame_little_endian_and_signed_current(self):
-        frame = {"id": 0x100, "data": [0x18, 0xFC, 0xFF, 0xFF, 0xD8, 0x16, 0xE0, 0x16], "dlc": 8}
+        frame = {"id": 0x100, "bus": "can1", "direction": "rx", "ide": "standard", "rtr": False, "data": [0x18, 0xFC, 0xFF, 0xFF, 0xD8, 0x16, 0xE0, 0x16], "dlc": 8}
         signals = decode_can1_frame(frame)
         self.assertEqual(signals[0]["name"], "totalCurrent")
         self.assertEqual(signals[0]["value"], -1000)
@@ -13,14 +41,14 @@ class ProtocolDecoderTests(unittest.TestCase):
         self.assertEqual(signals[2]["unit"], "0.1V")
 
     def test_decodes_cell_frame_using_compatibility_slot_index(self):
-        frame = {"id": 0x105, "data": [0x70, 0x0E, 0x72, 0x0E, 0x74, 0x0E, 0x76, 0x0E], "dlc": 8}
+        frame = {"id": 0x105, "bus": "can1", "direction": "rx", "ide": "standard", "rtr": False, "data": [0x70, 0x0E, 0x72, 0x0E, 0x74, 0x0E, 0x76, 0x0E], "dlc": 8}
         signals = decode_can1_frame(frame)
         self.assertEqual(signals[0]["name"], "cellVoltage[4]")
         self.assertEqual(signals[0]["value"], 3696)
         self.assertEqual(signals[-1]["name"], "cellVoltage[7]")
 
     def test_short_frame_is_partial_and_does_not_invent_values(self):
-        signals = decode_can1_frame({"id": 0x139, "data": [1, 0], "dlc": 2})
+        signals = decode_can1_frame({"id": 0x139, "bus": "can1", "direction": "rx", "ide": "standard", "rtr": False, "data": [1, 0], "dlc": 2})
         self.assertTrue(all(signal["quality"] == "partial" for signal in signals))
         self.assertIsNone(signals[2]["value"])
 

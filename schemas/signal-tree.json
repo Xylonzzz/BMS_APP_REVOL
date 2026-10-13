@@ -3,25 +3,505 @@
   "$id": "https://bms-app-revol.local/schemas/signal-tree.json",
   "title": "BMS Signal Tree",
   "type": "object",
-  "required": ["id", "timestamp", "firmwareVersion", "totalVoltage", "current", "cells", "frames"],
+  "required": [
+    "id",
+    "timestamp",
+    "firmwareVersion",
+    "totalVoltage",
+    "current",
+    "cells",
+    "frames"
+  ],
   "properties": {
-    "id": {"type": "string"},
-    "timestamp": {"type": "number"},
-    "firmwareVersion": {"type": "string"},
-    "totalVoltage": {"$ref": "#/$defs/bmsValue"},
-    "current": {"$ref": "#/$defs/bmsValue"},
-    "cells": {"type": "array", "items": {"$ref": "#/$defs/cellVoltage"}},
-    "frames": {"type": "array", "items": {"$ref": "#/$defs/canFrame"}},
-    "diagnostics": {"type": "array", "items": {"$ref": "#/$defs/diagnosticEvent"}},
-    "modelDetection": {"$ref": "#/$defs/modelDetection"},
-    "replayScenario": {"type": "string"}
+    "id": {
+      "type": "string"
+    },
+    "timestamp": {
+      "type": "number"
+    },
+    "firmwareVersion": {
+      "type": "string"
+    },
+    "totalVoltage": {
+      "$ref": "#/$defs/bmsValue"
+    },
+    "current": {
+      "$ref": "#/$defs/bmsValue"
+    },
+    "packStatus": {
+      "$ref": "#/$defs/packStatus"
+    },
+    "cells": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/cellVoltage"
+      }
+    },
+    "frames": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/canFrame"
+      }
+    },
+    "diagnostics": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/diagnosticEvent"
+      }
+    },
+    "modelDetection": {
+      "$ref": "#/$defs/modelDetection"
+    },
+    "replayScenario": {
+      "type": "string"
+    },
+    "temperatures": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/bmsValue"
+      }
+    },
+    "dataSource": {
+      "enum": [
+        "simulation",
+        "can",
+        "file"
+      ],
+      "description": "模拟、实时 CAN 或文件记录；缺失表示历史记录未声明。"
+    },
+    "sequenceScope": {
+      "enum": [
+        "host_rx",
+        "simulation"
+      ],
+      "description": "主机接收序号不表示固件采样批次。"
+    },
+    "evidenceFrames": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/canFrame"
+      },
+      "description": "保留读数对应的原始帧，不代表本步收到新帧。"
+    },
+    "signals": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/bmsValue"
+      }
+    },
+    "connectionState": {
+      "enum": [
+        "connected",
+        "disconnected"
+      ]
+    }
   },
   "$defs": {
-    "quality": {"type": "string", "enum": ["valid", "pec_error", "timeout", "partial", "stale", "range_error", "disconnected", "unknown"]},
-    "bmsValue": {"type": "object", "required": ["value", "timestamp", "source", "valid", "quality"], "properties": {"value": {}, "timestamp": {"type": "number"}, "source": {"type": "string"}, "sequence": {"type": "integer"}, "valid": {"type": "boolean"}, "quality": {"$ref": "#/$defs/quality"}, "rawFrameIds": {"type": "array", "items": {"type": "integer"}}}},
-    "cellVoltage": {"allOf": [{"$ref": "#/$defs/bmsValue"}, {"type": "object", "required": ["cellIndex", "unit"], "properties": {"cellIndex": {"type": "integer", "minimum": 0}, "unit": {"const": "mV"}, "physicalValid": {"type": "boolean"}}}]},
-    "canFrame": {"type": "object", "required": ["id", "bus", "data", "dlc", "timestamp", "direction", "sequence"], "properties": {"id": {"type": "integer"}, "bus": {"enum": ["can1", "can2"]}, "data": {"type": "array", "items": {"type": "integer", "minimum": 0, "maximum": 255}}, "dlc": {"type": "integer", "minimum": 0, "maximum": 64}, "timestamp": {"type": "number"}, "direction": {"enum": ["rx", "tx"]}, "sequence": {"type": "integer"}, "ide": {"enum": ["standard", "extended"]}, "rtr": {"type": "boolean"}, "ruleVersion": {"type": "string"}}},
-    "modelDetection": {"type": "object", "required": ["model", "mode", "confidence", "reason", "observed", "ruleVersion", "timestamp"], "properties": {"model": {"enum": ["af", "ef", "unknown"]}, "mode": {"enum": ["automatic", "manual"]}, "confidence": {"enum": ["high", "medium", "low"]}, "reason": {"type": "string"}, "observed": {"type": "array", "items": {"type": "string"}}, "ruleVersion": {"type": "string"}, "timestamp": {"type": "number"}}},
-    "diagnosticEvent": {"type": "object", "required": ["id", "timestamp", "severity", "chain", "code", "message", "evidence", "ruleVersion"], "properties": {"id": {"type": "string"}, "timestamp": {"type": "number"}, "severity": {"enum": ["info", "warning", "error"]}, "chain": {"type": "string"}, "code": {"type": "string"}, "message": {"type": "string"}, "evidence": {"type": "array", "items": {"type": "string"}}, "ruleVersion": {"type": "string"}}}
+    "quality": {
+      "type": "string",
+      "enum": [
+        "valid",
+        "pec_error",
+        "timeout",
+        "partial",
+        "stale",
+        "range_error",
+        "disconnected",
+        "unknown"
+      ]
+    },
+    "bmsValue": {
+      "type": "object",
+      "required": [
+        "value",
+        "timestamp",
+        "source",
+        "valid",
+        "quality"
+      ],
+      "properties": {
+        "value": {},
+        "timestamp": {
+          "type": "number"
+        },
+        "source": {
+          "type": "string"
+        },
+        "sequence": {
+          "type": "integer"
+        },
+        "valid": {
+          "type": "boolean"
+        },
+        "quality": {
+          "$ref": "#/$defs/quality"
+        },
+        "rawFrameIds": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        }
+      }
+    },
+    "packVoltage": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/bmsValue"
+        },
+        {
+          "type": "object",
+          "required": [
+            "unit"
+          ],
+          "properties": {
+            "value": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "unit": {
+              "const": "V"
+            }
+          }
+        }
+      ]
+    },
+    "packCurrent": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/bmsValue"
+        },
+        {
+          "type": "object",
+          "required": [
+            "unit"
+          ],
+          "properties": {
+            "value": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "unit": {
+              "const": "A"
+            }
+          }
+        }
+      ]
+    },
+    "packSoc": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/bmsValue"
+        },
+        {
+          "type": "object",
+          "required": [
+            "unit"
+          ],
+          "properties": {
+            "value": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "unit": {
+              "const": "%"
+            }
+          }
+        }
+      ]
+    },
+    "packStatus": {
+      "type": "object",
+      "description": "0x100/0x101 状态量，已换算为 V/A/%；字段缺失表示无证据，不由软件槽累压替代 ADC 总压。",
+      "properties": {
+        "totalVoltageAdc": {
+          "$ref": "#/$defs/packVoltage"
+        },
+        "totalVoltageAccumulated": {
+          "$ref": "#/$defs/packVoltage"
+        },
+        "prechargeVoltage": {
+          "$ref": "#/$defs/packVoltage"
+        },
+        "current": {
+          "$ref": "#/$defs/packCurrent"
+        },
+        "soc": {
+          "$ref": "#/$defs/packSoc"
+        }
+      }
+    },
+    "cellVoltage": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/bmsValue"
+        },
+        {
+          "type": "object",
+          "required": [
+            "cellIndex",
+            "unit"
+          ],
+          "properties": {
+            "cellIndex": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "unit": {
+              "const": "mV"
+            },
+            "physicalValid": {
+              "type": "boolean"
+            },
+            "moduleIndex": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "从0开始的模组索引；缺失表示未声明模组归属。"
+            },
+            "channelIndex": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "从0开始的模组内软件通道索引，包含保留槽；缺失表示未声明。"
+            }
+          }
+        }
+      ]
+    },
+    "canFrame": {
+      "type": "object",
+      "description": "经典 CAN 帧，direction 相对 PC；采集时间和 sequence 为主机接收证据，不能当作固件批次。simulation 质量仅为模拟器元数据。",
+      "required": [
+        "id",
+        "bus",
+        "data",
+        "dlc",
+        "timestamp",
+        "direction",
+        "sequence"
+      ],
+      "properties": {
+        "id": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 536870911
+        },
+        "bus": {
+          "enum": [
+            "can1",
+            "can2"
+          ]
+        },
+        "data": {
+          "type": "array",
+          "maxItems": 8,
+          "items": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 255
+          }
+        },
+        "dlc": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 8
+        },
+        "timestamp": {
+          "type": "number"
+        },
+        "direction": {
+          "enum": [
+            "rx",
+            "tx"
+          ]
+        },
+        "sequence": {
+          "type": "integer"
+        },
+        "ide": {
+          "enum": [
+            "standard",
+            "extended"
+          ]
+        },
+        "rtr": {
+          "type": "boolean"
+        },
+        "ruleVersion": {
+          "type": "string"
+        },
+        "qualityMetadataSource": {
+          "const": "simulation"
+        },
+        "signalQualities": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/quality"
+          }
+        },
+        "decoded": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/decodedSignal"
+          }
+        },
+        "acquisitionSource": {
+          "enum": [
+            "can",
+            "file"
+          ]
+        },
+        "originalSequence": {
+          "type": "integer"
+        },
+        "hardwareTimestamp": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "TimeFlag": {
+          "enum": [
+            0,
+            1
+          ]
+        }
+      }
+    },
+    "decodedSignal": {
+      "type": "object",
+      "required": [
+        "name",
+        "value",
+        "unit",
+        "byte_range",
+        "quality",
+        "meaning"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "value": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "unit": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "byte_range": {
+          "type": "string"
+        },
+        "quality": {
+          "$ref": "#/$defs/quality"
+        },
+        "meaning": {
+          "type": "string"
+        }
+      }
+    },
+    "modelDetection": {
+      "type": "object",
+      "required": [
+        "model",
+        "mode",
+        "confidence",
+        "reason",
+        "observed",
+        "ruleVersion",
+        "timestamp"
+      ],
+      "properties": {
+        "model": {
+          "enum": [
+            "af",
+            "ef",
+            "unknown"
+          ]
+        },
+        "mode": {
+          "enum": [
+            "automatic",
+            "manual"
+          ]
+        },
+        "confidence": {
+          "enum": [
+            "high",
+            "medium",
+            "low"
+          ]
+        },
+        "reason": {
+          "type": "string"
+        },
+        "observed": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "ruleVersion": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "number"
+        }
+      }
+    },
+    "diagnosticEvent": {
+      "type": "object",
+      "required": [
+        "id",
+        "timestamp",
+        "severity",
+        "chain",
+        "code",
+        "message",
+        "evidence",
+        "ruleVersion"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "number"
+        },
+        "severity": {
+          "enum": [
+            "info",
+            "warning",
+            "error"
+          ]
+        },
+        "chain": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "ruleVersion": {
+          "type": "string"
+        }
+      }
+    }
   }
 }

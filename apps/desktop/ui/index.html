@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>REVOL · 连接工作台</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+<header><div class="brand"><img src="assets/revol-battery.svg" alt="" width="28" height="34"><span>REVOL</span></div><span class="edition">WINDOWS DESKTOP · 0.1</span></header>
+<section class="intro"><p class="eyebrow">BATTERY WORKSPACE</p><h1>从连接开始。<br><span>让每个数据都有来处。</span></h1><p>选择本次会话的数据来源，在独立工作台中查看、记录与回放。</p></section>
+<form id="connection-form">
+<div class="mode-switch" aria-label="数据来源">
+<label><input type="radio" name="mode" value="simulation" checked><span>模拟数据<small>离线预览</small></span></label>
+<label><input type="radio" name="mode" value="file"><span>记录文件<small>JSONL 导入</small></span></label>
+<label><input type="radio" name="mode" value="can"><span>只读 CAN<small>USB 适配器</small></span></label>
+</div>
+<div id="file-fields" class="source-fields" hidden><label for="input-path">JSONL 文件</label><div class="path-input"><input id="input-path" placeholder="选择原始帧或快照文件"><button type="button" data-pick="jsonl">选择文件</button></div></div>
+<div id="can-fields" class="source-fields" hidden><label for="dll-path">ControlCAN DLL</label><div class="path-input"><input id="dll-path" placeholder="选择与程序位数匹配的厂商 DLL"><button type="button" data-pick="dll">选择 DLL</button></div><div class="numbers"><label>设备类型<input id="device-type" type="number" min="0" value="4"></label><label>设备索引<input id="device-index" type="number" min="0" value="0"></label><label>通道<input id="channel" type="number" min="0" value="0"></label><label>波特率<select id="bitrate"><option value="500000">500 kbit/s</option><option value="250000">250 kbit/s</option></select></label></div><p class="hint">只听模式，不发送控制命令或 ACK。参数请按适配器和现场总线填写。</p></div>
+<div id="firmware-field" class="source-fields" hidden><label for="firmware-version">固件版本标签 <small>可选 · 手工记录，非握手结果</small></label><input id="firmware-version" placeholder="未知时留空"></div>
+<div class="actions"><button id="start" class="primary" type="submit">启动工作台 <span>↗</span></button><button id="workspace" type="button" disabled>显示工作台</button><button id="stop" type="button" disabled>停止会话</button></div>
+</form>
+<section class="status-panel" aria-live="polite"><div><span id="status-dot" class="status-dot"></span><strong id="status-title">准备就绪</strong><span id="frame-count"></span></div><p id="status-message">尚未启动采集。每次启动会创建一个独立会话。</p><small id="session-path"></small></section>
+<footer>本地记录 · 原始证据保留<span id="api-url"></span></footer>
+</main>
+<script src="app.js"></script>
+</body>
+</html>

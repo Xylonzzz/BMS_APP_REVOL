@@ -7,3 +7,4 @@ runtime/live-check/
 node_modules/
 dist/
 .env
+.venv/

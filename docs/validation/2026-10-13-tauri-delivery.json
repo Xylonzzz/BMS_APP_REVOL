@@ -1,0 +1,15 @@
+{
+  "artifactDirectory": "D:\\BMS\\BMS_APP_REVOL\\dist\\windows-tauri\\0.1.0-candidate-20261013-080259",
+  "softwareValidated": true,
+  "hardwareValidated": false,
+  "checks": [
+    "Python sidecar IPC unit tests: 4 passed",
+    "Rust executable self-test: passed",
+    "Frozen web/schema files match source",
+    "Tauri WebView2 setup/start/workspace/stop/main-window close: passed",
+    "NSIS temporary install/self-test/uninstall: passed",
+    "Final portable artifact self-test: passed",
+    "SHA256SUMS verified"
+  ],
+  "installerSha256": "5ff735f3fd6cbd07eafabad20f98ec991afc42cab5434728602f7b96e228cac4"
+}

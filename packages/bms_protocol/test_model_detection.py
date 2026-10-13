@@ -62,6 +62,20 @@ class ModelDetectionTests(unittest.TestCase):
         automatic = detect_model(snapshot, override=None)
         self.assertEqual(automatic["model"], "af")
 
+    def test_old_or_mixed_batch_evidence_cannot_select_model(self):
+        for field, value in (("timestamp", 1.0), ("sequence", 2)):
+            snapshot = make_snapshot()
+            snapshot["temperatures"][69][field] = value
+            with self.subTest(field=field):
+                self.assertEqual(detect_model(snapshot)["model"], "unknown")
+
+    def test_missing_value_or_sequence_cannot_select_model(self):
+        for field in ("value", "sequence", "timestamp"):
+            snapshot = make_snapshot()
+            snapshot["temperatures"][69].pop(field)
+            with self.subTest(field=field):
+                self.assertEqual(detect_model(snapshot)["model"], "unknown")
+
 
 if __name__ == "__main__":
     unittest.main()

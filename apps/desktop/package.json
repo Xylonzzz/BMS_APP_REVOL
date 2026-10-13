@@ -1,0 +1,7 @@
+{
+  "name": "revol-desktop",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {"tauri": "tauri", "check": "node --check ui/app.js"},
+  "devDependencies": {"@tauri-apps/cli": "2.12.2"}
+}

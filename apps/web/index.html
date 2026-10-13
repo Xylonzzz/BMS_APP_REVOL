@@ -1,52 +1,83 @@
 <!doctype html>
 <html lang="zh-CN">
 <head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>BMS APP REVOL</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="theme.css">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>REVOL · 电池工作台</title>
+<link rel="icon" type="image/svg+xml" href="assets/revol-battery.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="theme.css?v=product-2">
 </head>
-<body data-theme="operations">
+<body data-theme="minimal">
 <div class="app-shell">
-  <aside class="sidebar rail">
-    <div class="brand"><span class="brand-mark">B</span><div><b>BMS APP</b><small>REVOL / SIGNAL WORKSPACE</small></div></div>
-    <div class="connection-pill connection"><i id="connection-dot" class="dot"></i><span id="connection-side">未连接</span></div>
-    <nav id="nav" class="nav" aria-label="主导航">
-      <button class="nav-item active" data-page="state"><strong>总览</strong><small>BMS_STATE · 本批次可信度</small></button>
-      <button class="nav-item" data-page="voltage"><strong>单体电压</strong><small>Cell_Vol_1/2 · 136 + 8 保留槽</small></button>
-      <button class="nav-item" data-page="temperature"><strong>单体温度</strong><small>Cell_Tem_1/2 · NTC 质量</small></button>
-      <button class="nav-item" data-page="relay"><strong>继电器 / 充电</strong><small>realy_charge · 只读</small></button>
-      <button class="nav-item" data-page="threshold"><strong>阈值</strong><small>Threshold_Value1 · 只读</small></button>
-      <button class="nav-item" data-page="can"><strong>CAN 收发</strong><small>原始帧 · 解析对照</small></button>
-      <button class="nav-item" data-page="diagnostics"><strong>诊断与 Agent</strong><small>链路证据 · 规则版本</small></button>
-    </nav>
-    <div class="sidebar-foot rail-foot"><span>固件</span><strong id="firmware-side">—</strong><span>外观</span><select id="theme" class="theme-select"><option value="engineering">Engineering</option><option value="operations" selected>Operations</option><option value="minimal">Minimal</option></select><p>AF / EF 自动识别<br><em>证据齐全后才切换</em></p></div>
-  </aside>
-
-  <main class="main">
-    <header class="topbar top">
-      <div><div class="eyebrow">BMS APP REVOL / <span id="page-kicker">BMS_STATE</span></div><h1 id="page-title">这批数据，值得相信吗？</h1><p class="top-copy">先看质量，再看数字。原始帧、解析值与诊断证据始终在同一条视线里。</p></div>
-      <div class="controls actions"><input id="api-url" value="http://127.0.0.1:8765" aria-label="API地址"><select id="replay-scenario" class="select" aria-label="回放场景"><option value="">实时快照</option></select><select id="model-override" class="select" aria-label="AF/EF型号"><option value="">自动型号</option><option value="af">AF</option><option value="ef">EF</option></select><button id="replay-load" class="chip">加载回放</button><button id="refresh" class="chip">刷新</button><button id="fullscreen" class="chip">全屏</button></div>
-    </header>
-
-    <section id="page-state" class="page active">
-      <section class="hero"><article class="card signal-card"><div class="card-label"><span>Snapshot quality</span><span>SEQ <b id="sequence">—</b></span></div><div class="big-status"><strong id="quality-state">—</strong><span id="quality-detail">等待数据</span></div><p id="quality-copy" class="signal-copy">正在等待 API 快照。数据质量、AF/EF 判断和原始证据会在同一处显示。</p></article><div class="mini-grid"><div class="mini"><small>总压 / ADC</small><b id="total-voltage">—</b></div><div class="mini"><small>电流</small><b id="current">—</b></div><div class="mini"><small>AF / EF</small><b id="model">—</b></div><div class="mini"><small>固件</small><b id="firmware">—</b></div></div></section>
-      <section class="row"><article class="card"><div class="section-head"><h2>单体电压 · 136 / 144 槽</h2><small id="cell-summary">—</small></div><div id="cells" class="cells"></div><div class="legend"><span>绿色 · 当前有效</span><span class="legend-warn">琥珀 · 待确认</span><span class="legend-bad">珊瑚 · 无效但保留原值</span></div></article><article class="card trend-card"><div class="section-head"><h2>采集批次</h2><small id="updated">—</small></div><div class="spark"><i class="bar" style="height:47%"></i><i class="bar" style="height:54%"></i><i class="bar" style="height:52%"></i><i class="bar" style="height:61%"></i><i class="bar" style="height:57%"></i><i class="bar warn" style="height:70%"></i><i class="bar" style="height:79%"></i></div><div class="legend"><span>当前快照</span><span id="quality-summary">—</span></div></article></section>
-      <section class="card customization"><div class="section-head"><h2>回放与自定义</h2><small>参考时序的外观工作台</small></div><div class="actions customization-actions"><button class="chip" data-theme="engineering">深石墨</button><button class="chip" data-theme="operations">苔绿</button><button class="chip" data-theme="minimal">纸张</button><button class="chip" data-density="compact">紧凑密度</button><button class="chip" data-density="cozy">舒适密度</button><button class="chip" data-motion="off">关闭动效</button></div><div class="model-reason"><span>型号判断依据</span><b id="model-reason">—</b></div></section>
-    </section>
-
-    <section id="page-voltage" class="page"><article class="card"><div class="section-head"><h2>单体电压 / 兼容 144 槽</h2><small>原始值保留 · 质量状态优先</small></div><div id="cells-page" class="cells"></div></article></section>
-    <section id="page-temperature" class="page"><article class="card placeholder"><h2>单体温度 / Cell_Tem_1 · Cell_Tem_2</h2><p>保留 AF / EF 温度页语义。当前阶段通过回放快照展示温度质量、断线和证据来源。</p><div class="placeholder-tags"><span>48 路当前遥测</span><span>AF / EF 显示</span><span>温度断线</span></div></article></section>
-    <section id="page-relay" class="page"><article class="card placeholder"><div class="section-head"><h2>继电器 / 充电</h2><span class="readonly-badge">只读预览</span></div><p>参考旧上位机 realy_charge 页面保留主正、主负、预充、DCDC 和充电机状态分区。控制命令尚未接入。</p></article></section>
-    <section id="page-threshold" class="page"><article class="card placeholder"><h2>阈值 / Threshold_Value1</h2><p>保留告警名称、等级阈值、Precharge_Time、Balance 和开路参数分组。当前为只读预览。</p></article></section>
-    <section id="page-can" class="page"><article class="card"><div class="section-head"><h2>CAN 收发 / 原始帧与解析</h2><span class="readonly-badge">只读预览</span></div><div class="frame-table-wrap"><table><thead><tr><th>时间</th><th>总线</th><th>ID</th><th>DLC</th><th>方向</th><th>原始数据</th><th>解析</th></tr></thead><tbody id="frame-table"><tr><td colspan="7" class="muted">等待数据</td></tr></tbody></table></div></article></section>
-    <section id="page-diagnostics" class="page"><article class="card"><div class="section-head"><h2>诊断与 Agent</h2><span class="readonly-badge">只读分析</span></div><div class="agent-flow"><span>原始帧</span><b>→</b><span>协议解析</span><b>→</b><span>质量判断</span><b>→</b><span>H/A 链路</span><b>→</b><span>证据报告</span></div><div id="diagnostic-detail"><p class="muted">暂无诊断事件。</p></div></article></section>
-    <article class="card ai-panel"><div class="section-head"><h2>辅助分析</h2><span class="readonly-badge">只读</span></div><div class="controls"><label for="ai-provider">模型服务</label><select id="ai-provider" class="select"><option>正在读取提供商…</option></select><button id="ai-analyze" class="chip" disabled>分析最新快照</button></div><label class="remote-option"><input type="checkbox" id="ai-allow-remote">允许将本次快照的质量摘要发送给已配置的自定义模型服务</label><p class="muted" id="ai-status" role="status" aria-live="polite">准备分析服务…</p><div id="ai-result" aria-live="polite"></div></article>
-  </main>
-
-  <aside class="evidence"><div class="eyebrow">EVIDENCE RAIL</div><h2>这次判断凭什么？</h2><p class="evidence-sub">每个数字都能回到帧、规则和时间。</p><div class="rail-line" id="evidence-rail"><div class="ev"><small>01 · RAW FRAME</small><b>等待原始帧</b><p>API 快照加载后，显示总线、ID、DLC、方向和解析规则。</p></div></div><div class="frame"><div class="eyebrow">LAST FRAME</div><code id="last-frame">CAN —\n等待数据</code></div><div class="tune"><div class="tune-title"><b>质量状态</b><small id="model-reason-side">—</small></div><div class="quality-key"><span><i class="key-dot valid"></i>有效</span><span><i class="key-dot warn"></i>待确认</span><span><i class="key-dot bad"></i>无效</span></div></div></aside>
+<aside class="sidebar">
+<a class="brand" href="./" aria-label="REVOL 首页"><img class="brand-mark" src="assets/revol-battery.svg" alt="" width="34" height="40"><span>REVOL<small>BATTERY WORKSPACE</small></span></a>
+<div class="nav-section">工作台 <span>WORKSPACE</span></div>
+<nav id="nav" class="nav" aria-label="主导航">
+<button class="nav-item active" data-page="state"><span class="nav-symbol">◫</span><strong>电池总览</strong></button>
+<button class="nav-item" data-page="voltage"><span class="nav-symbol">▦</span><strong>单体电压</strong></button>
+<button class="nav-item" data-page="temperature"><span class="nav-symbol">♧</span><strong>单体温度</strong></button>
+<button class="nav-item" data-page="relay"><span class="nav-symbol">⌁</span><strong>继电器与充电</strong></button>
+<button class="nav-item" data-page="threshold"><span class="nav-symbol">≡</span><strong>保护阈值</strong></button>
+<div class="nav-divider"></div>
+<button class="nav-item" data-page="can"><span class="nav-symbol">⌘</span><strong>原始报文</strong></button>
+<button class="nav-item" data-page="catalog"><span class="nav-symbol">⋮</span><strong>A03 字段目录</strong></button>
+<button class="nav-item" data-page="sessions"><span class="nav-symbol">↗</span><strong>记录与趋势</strong></button>
+<button class="nav-item" data-page="diagnostics"><span class="nav-symbol">✳</span><strong>诊断与分析</strong></button>
+</nav>
+<div class="sidebar-foot">
+<div class="connection-pill"><i id="connection-dot"></i><span id="connection-side">未连接</span></div>
+<div class="firmware-label">固件 / FIRMWARE<strong id="firmware-side">—</strong></div>
+<label class="theme-label" for="theme">工作台外观</label><select id="theme"><option value="minimal" selected>日间 · 陶瓷白</option><option value="engineering">夜间 · 深海蓝</option><option value="operations">低亮 · 雾蓝</option></select>
+<div class="sidebar-note"><span class="read-only-dot"></span>只读工作区</div>
 </div>
-<script src="app.js"></script><script src="ai.js"></script>
-</body>
-</html>
+</aside>
+<main class="main">
+<header class="topbar"><div class="breadcrumb">BMS APP <span>/</span> <span id="page-kicker">OVERVIEW</span></div><div class="top-actions"><span id="environment-tag" class="environment-tag">WAITING</span><button id="fullscreen" class="icon-button" aria-label="全屏">⛶</button></div></header>
+<div class="page-heading"><div><h1 id="page-title">电池总览<span class="heading-dot">.</span></h1><p id="page-description">从整包状态，到每一个模组。</p></div><div class="heading-meta"><span>当前记录</span><strong id="updated">等待数据</strong></div></div>
+<section class="session-bar" aria-label="会话与回放">
+<div class="session-source"><i></i><span>数据会话</span></div>
+<select id="replay-scenario" aria-label="回放场景"><option value="">API 最新快照</option></select><button id="replay-load" class="button primary">加载回放 <span>↗</span></button>
+<div class="session-divider"></div><button id="refresh" class="button">刷新快照</button>
+<label class="auto-refresh-control"><input type="checkbox" id="auto-refresh" checked><span>自动刷新<small id="auto-refresh-note">每秒更新</small></span></label>
+<details class="connection-settings"><summary>连接设置 <span>⌄</span></summary><div class="settings-popover"><label for="api-url">API 地址</label><input id="api-url" value="http://127.0.0.1:8765" aria-label="API地址"><label for="model-override">型号识别</label><select id="model-override" aria-label="AF/EF型号"><option value="">自动型号</option><option value="af">AF · 手动选择</option><option value="ef">EF · 手动选择</option></select><p>手动选择只覆盖界面，不改变原始证据。</p></div></details>
+</section>
+<div class="record-line"><p id="data-status" role="status" aria-live="polite">正在读取 API 快照…</p><div class="playback-toolbar"><button id="replay-prev" class="step-button" disabled aria-label="上一条">←</button><span id="replay-position" aria-live="polite">尚未加载回放</span><button id="replay-next" class="step-button" disabled aria-label="下一条">→</button></div></div>
+<div class="workspace-grid"><div class="workspace-main">
+<section id="page-state" class="page active">
+<section class="pack-metrics" aria-label="整包关键数据">
+<article class="pack-metric" id="pack-voltage-card"><span class="pack-metric-label">电池总压 <small>ADC</small></span><b id="pack-voltage">—</b><span class="pack-metric-quality" id="pack-voltage-quality">未接入</span><small class="pack-metric-source" id="pack-voltage-source">独立总压采样</small></article>
+<article class="pack-metric" id="total-voltage-card"><span class="pack-metric-label">单体累压 <small>Σ</small></span><b id="total-voltage">—</b><span class="pack-metric-quality" id="total-voltage-quality">未接入</span><small class="pack-metric-source" id="total-voltage-source">单体电压累加</small></article>
+<article class="pack-metric" id="precharge-voltage-card"><span class="pack-metric-label">预充电压 <small>ADC</small></span><b id="precharge-voltage">—</b><span class="pack-metric-quality" id="precharge-voltage-quality">未接入</span><small class="pack-metric-source" id="precharge-voltage-source">负载侧独立采样</small></article>
+<article class="pack-metric" id="current-card"><span class="pack-metric-label">整包电流</span><b id="current">—</b><span class="pack-metric-quality" id="current-quality">未接入</span><small class="pack-metric-source" id="current-source">放电为正 · 充电为负</small></article>
+<article class="pack-metric" id="soc-card"><span class="pack-metric-label">剩余电量 <small>SOC</small></span><b id="soc">—</b><span class="pack-metric-quality" id="soc-quality">未接入</span><small class="pack-metric-source" id="soc-source">固件 SOC 估计</small></article>
+</section>
+<div class="pack-metric-note"><span>总压与预充电压分别采样；累压由单体电压相加。</span><button class="text-button" id="open-status-frames">查看状态报文 ↗</button></div>
+<div class="overview-strip pack-health">
+<article class="status-panel"><div class="eyebrow">数据质量 <span><span id="sequence-label">SEQ</span> <b id="sequence">—</b></span></div><strong id="quality-state">—</strong><span id="quality-detail">等待数据</span><p id="quality-copy">加载后显示当前记录质量。</p></article>
+<article class="metric-panel"><span>识别型号</span><b id="model">—</b><div class="metric-rule"></div><span>固件版本</span><b id="firmware" class="firmware-value">—</b></article>
+</div>
+<section class="pack-section"><div class="section-head"><div><div class="eyebrow">BATTERY MAP</div><h2>电池模组地图</h2></div><button class="text-button" id="open-voltage">查看全部单体 <span>↗</span></button></div><div class="pack-caption"><span id="cell-summary">—</span><div class="legend"><span><i class="valid"></i>有效</span><span><i class="warning"></i>待确认</span><span><i class="fault"></i>无效</span><span><i class="reserved"></i>保留槽</span></div></div><div id="cells" class="module-grid module-overview"></div><div class="pack-footnote"><span>每个小格对应一个槽位，点击查看原始证据。</span><span class="mono">mV</span></div></section>
+<section class="record-card"><div><span class="eyebrow">RECORD</span><p id="quality-summary">—</p></div><code id="snapshot-id">—</code></section>
+<details class="appearance"><summary>显示偏好 <span>主题 / 密度 / 动效</span></summary><div class="appearance-body"><button class="button" data-theme="minimal">Minimal · 陶瓷白</button><button class="button" data-theme="engineering">Engineering · 深海蓝</button><button class="button" data-theme="operations">Operations · 雾蓝</button><button class="button" data-density="compact">紧凑密度</button><button class="button" data-density="cozy">舒适密度</button><button class="button" data-motion="off">关闭动效</button></div><div class="profile-tools"><button id="profile-export" class="button">导出视图档案</button><label for="profile-import">导入 JSON <input id="profile-import" type="file" accept=".json,application/json"></label><button id="profile-reset" class="button">恢复默认</button></div><p id="profile-status" class="profile-status" role="status">主题、密度、动效与自动刷新按 v1 视图档案保存在本机。</p></details>
+<div class="model-reason" hidden><b id="model-reason">—</b></div>
+</section>
+<section id="page-voltage" class="page"><div class="section-head"><div><div class="eyebrow">CELL VOLTAGES</div><h2>按模组查看单体</h2></div><span class="unit-label">单位 mV</span></div><div class="pack-caption"><p>范围与压差仅统计有效物理电芯。</p><div class="legend"><span><i class="valid"></i>有效</span><span><i class="warning"></i>待确认</span><span><i class="fault"></i>无效</span></div></div><div id="cells-page" class="module-grid module-detail"></div></section>
+<section id="page-temperature" class="page"><div class="section-head"><div><div class="eyebrow">THERMAL MAP</div><h2>温度通道地图</h2></div><span id="temperature-summary" class="subtle-badge">48 通道</span></div><p class="product-note">按固件软件模组划分，每模组 GPIO1–6。物理模组顺序与探头安装位置尚未确认；点击通道查看接收证据。</p><div id="temperature-grid" class="thermal-grid"></div><article id="temperature-inspector" class="product-detail" aria-live="polite">选择温度通道查看详情。</article></section>
+<section id="page-relay" class="page"><div class="section-head"><div><div class="eyebrow">POWER FEEDBACK</div><h2>继电器反馈</h2></div><span class="subtle-badge">只读</span></div><p class="product-note">显示固件上报状态；预充反馈可能来自命令状态，不等同实物触点闭合。</p><div id="relay-grid" class="telemetry-grid"></div><div class="section-head product-section"><div><div class="eyebrow">CHARGER</div><h2>充电状态与目标</h2></div></div><div id="charger-grid" class="telemetry-grid"></div><div class="section-head product-section"><div><div class="eyebrow">FAULT REGISTER</div><h2>固件告警</h2></div><span id="alarm-summary" class="subtle-badge">等待数据</span></div><p class="product-note">0 为无告警，非 0 保留原始状态。分级和布尔含义随字段不同；屏蔽掩码不证明故障消失。</p><div id="alarm-grid" class="alarm-grid"></div></section>
+<section id="page-threshold" class="page"><div class="section-head"><div><div class="eyebrow">PROTECTION PARAMETERS</div><h2>保护参数回读</h2></div><span class="subtle-badge">只读</span></div><p class="product-note">仅显示收到的 0x150–0x15D 上行参数。此工作区不发送查询或写入命令；尚无回包时显示未收到。回读不证明保护启用或 Flash 保存。</p><div id="threshold-table" class="table-surface"></div></section>
+<section id="page-catalog" class="page"><div class="section-head"><div><div class="eyebrow">A03 · TRANSMITTED FIELDS</div><h2>字段、值与证据</h2></div><span id="catalog-count" class="subtle-badge">目录读取中</span></div><label class="search-field" for="catalog-search"><span>搜索字段</span><input id="catalog-search" type="search" placeholder="名称、A03 路径或字段名"></label><p class="product-note">目录覆盖当前协议已定义的传输字段，不代表完整固件内存。未知单位保留 raw；缺少传输证据的字段显示未收到。</p><div id="catalog-tree" class="catalog-tree"></div></section>
+<section id="page-sessions" class="page"><div class="section-head"><div><div class="eyebrow">SESSION LIBRARY</div><h2>记录库</h2></div><button id="sessions-refresh" class="button">刷新列表</button></div><p id="sessions-status" class="product-note" role="status">正在读取记录库…</p><div id="session-list" class="session-list"></div><section class="trend-panel product-section"><div class="section-head"><div><div class="eyebrow">LOADED WINDOW</div><h2>记录趋势</h2></div><select id="trend-signal" aria-label="趋势信号"><option value="totalVoltageAdc">电池总压 / V</option><option value="totalVoltageAccumulated">单体累压 / V</option><option value="prechargeVoltage">预充电压 / V</option><option value="current">整包电流 / A</option><option value="soc">SOC / %</option></select></div><p id="trend-caption" class="product-note">加载会话后显示当前页的趋势。</p><div id="trend-chart" class="trend-chart"></div><p class="product-note">横轴为快照记录时间。实线与实心点表示有效值，虚线与空心点保留待确认或无效读数；缺值断开。趋势不证明设备采样同步。</p></section></section>
+<section id="page-can" class="page"><div class="section-head"><div><div class="eyebrow">CAN EXPLORER</div><h2>原始帧与解析对照</h2></div><span class="subtle-badge">只读</span></div><p class="frame-table-note">本步新输入，最多显示最近 40 帧。</p><div class="table-surface"><table><thead><tr><th id="frame-time-label">记录时间</th><th id="frame-sequence-label">记录序号</th><th>总线</th><th>ID</th><th>DLC</th><th>方向</th><th>原始字节</th><th>解析与质量</th></tr></thead><tbody id="frame-table"><tr><td colspan="8">等待数据</td></tr></tbody></table></div><section class="retained-evidence"><div class="section-head"><div><div class="eyebrow">RETAINED EVIDENCE</div><h2>保留读数证据</h2></div><span id="evidence-frame-count" class="subtle-badge">0 帧</span></div><p class="frame-table-note">这些帧支撑当前保留的读数，沿用原时间与序号，不计入本步新帧。</p><div class="table-surface"><table><thead><tr><th>原记录时间</th><th>原序号</th><th>总线</th><th>ID</th><th>DLC</th><th>方向</th><th>原始字节</th><th>解析与质量</th></tr></thead><tbody id="evidence-frame-table"><tr><td colspan="8">尚无保留证据</td></tr></tbody></table></div></section></section>
+<section id="page-diagnostics" class="page"><div class="section-head"><div><div class="eyebrow">DIAGNOSTICS</div><h2>本批次诊断</h2></div><span class="subtle-badge">证据优先</span></div><div id="diagnostic-detail"></div>
+<article class="ai-panel"><div class="section-head"><h2>辅助分析</h2><span class="subtle-badge">只读</span></div><div class="ai-controls"><label for="ai-provider">分析服务</label><select id="ai-provider"><option>读取中…</option></select><button id="ai-analyze" class="button primary" disabled>分析 API 最新快照</button></div><label class="remote-option"><input type="checkbox" id="ai-allow-remote">允许将 API 最新快照的质量摘要发送给已配置的自定义模型服务</label><p id="ai-target" class="muted"></p><p id="ai-status" role="status" aria-live="polite">准备分析服务…</p><div id="ai-result" aria-live="polite"></div></article></section>
+</div>
+<aside class="evidence">
+<section class="inspector-card"><div class="inspector-heading"><span class="eyebrow">INSPECTOR</span><span class="inspector-dot"></span></div><h2>单体详情</h2><div id="cell-inspector"><div class="inspector-empty"><span>＋</span><p>选择一个单体</p><small>查看读数、质量与原始证据</small></div></div></section>
+<section class="evidence-card"><div class="section-head"><h2>当前记录证据</h2><span class="mono">↗</span></div><div id="evidence-rail"></div><div class="frame"><span class="eyebrow">最后一帧</span><code id="last-frame">等待数据</code></div></section>
+<div class="side-note"><i></i><p id="source-note">等待 API 提供数据来源。</p></div><small id="model-reason-side" hidden>—</small>
+</aside></div>
+<footer class="workspace-footer"><span>REVOL <b>／</b> BMS WORKSPACE</span><span>原始证据，始终可追溯。</span></footer>
+</main></div>
+<script src="modules.js?v=1"></script><script src="profiles.js?v=1"></script><script src="app.js?v=product-2"></script><script src="product.js?v=product-2"></script><script src="ai.js?v=module-workspace-1"></script>
+</body></html>

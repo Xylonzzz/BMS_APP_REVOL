@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bms-app-revol.local/schemas/replay-response.json",
+  "title": "BMS Replay Response",
+  "type": "object",
+  "required": [
+    "name",
+    "items"
+  ],
+  "properties": {
+    "name": {
+      "$ref": "#/$defs/scenario"
+    },
+    "items": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "scenario",
+          "sequence",
+          "timestamp",
+          "frames",
+          "snapshot",
+          "diagnostics"
+        ],
+        "properties": {
+          "scenario": {
+            "$ref": "#/$defs/scenario"
+          },
+          "sequence": {
+            "type": "integer"
+          },
+          "timestamp": {
+            "type": "number"
+          },
+          "frames": {
+            "type": "array",
+            "items": {
+              "$ref": "signal-tree.json#/$defs/canFrame"
+            }
+          },
+          "snapshot": {
+            "$ref": "signal-tree.json"
+          },
+          "diagnostics": {
+            "type": "array",
+            "items": {
+              "$ref": "signal-tree.json#/$defs/diagnosticEvent"
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "scenario": {
+      "enum": [
+        "valid",
+        "pec_error",
+        "partial",
+        "timeout_stale",
+        "disconnected_reconnect",
+        "af",
+        "ef",
+        "mixed_model"
+      ]
+    }
+  }
+}
